@@ -173,16 +173,16 @@ export const followUser = async (req, res) => {
                     res.status(200).json({ success, message })
                 }
                 else {
-                    await followUser.updateOne({ $pull: { followers: _id } })
-                    await user.updateOne({ $pull: { following: id } })
+                    // await followUser.updateOne({ $pull: { followers: _id } })
+                    // await user.updateOne({ $pull: { following: id } })
 
-                    success = true
-                    message = "User unfollowed successfully!"
-                    res.status(200).json({ success, message })
+                    // success = true
+                    // message = "User unfollowed successfully!"
+                    // res.status(200).json({ success, message })
 
-                    // success = false
-                    // message = "User is already followed by you!"
-                    // res.status(403).json({ success, message })
+                    success = false
+                    message = "User is already followed by you!"
+                    res.status(403).json({ success, message })
                 }
             }
             else {
