@@ -150,7 +150,7 @@ export const deleteUser = async (req, res) => {
 }
 
 // Follow a user
-export const followUser = async (req, res) => {
+export const followUnFollowUser = async (req, res) => {
 
     try {
 
@@ -161,77 +161,30 @@ export const followUser = async (req, res) => {
 
             const { _id } = req.body
             const user = await UserModel.findById(_id)
-
+            
             if (!(_id === id)) {
-
+                
                 if (!followUser.followers.includes(_id)) {
                     await followUser.updateOne({ $push: { followers: _id } })
                     await user.updateOne({ $push: { following: id } })
-
+                    
+                    const updatedUser = await UserModel.findById(_id)
+                    let updatedUserList = updatedUser.following
+                    
                     success = true
                     message = "User Followed!"
-                    res.status(200).json({ success, message })
+                    res.status(200).json({ success, message, updatedUserList })
                 }
                 else {
-                    // await followUser.updateOne({ $pull: { followers: _id } })
-                    // await user.updateOne({ $pull: { following: id } })
-
-                    // success = true
-                    // message = "User unfollowed successfully!"
-                    // res.status(200).json({ success, message })
-
-                    success = false
-                    message = "User is already followed by you!"
-                    res.status(403).json({ success, message })
-                }
-            }
-            else {
-                message = "Action forbidden"
-                success = false
-                res.status(403).json({ success, message })
-            }
-        }
-        else {
-            message = "User account doesn't exist!"
-            success = false
-            res.status(404).json({ success, message })
-        }
-
-    } catch (error) {
-        success = false
-        message = "Internal server error."
-        console.log("Error: " + error.message)
-        res.status(500).json({ success, message })
-    }
-}
-
-// Unfollow a user
-export const unFollowUser = async (req, res) => {
-
-    try {
-
-        const id = req.params.id
-        const unFollowUser = await UserModel.findById(id)
-
-        if (unFollowUser) {
-
-            const { _id } = req.body
-            const user = await UserModel.findById(_id)
-
-            if (!(_id === id)) {
-
-                if (unFollowUser.followers.includes(_id)) {
-                    await unFollowUser.updateOne({ $pull: { followers: _id } })
+                    await followUser.updateOne({ $pull: { followers: _id } })
                     await user.updateOne({ $pull: { following: id } })
+                    
+                    const updatedUser = await UserModel.findById(_id)
+                    let updatedUserList = updatedUser.following
 
                     success = true
                     message = "User unfollowed successfully!"
-                    res.status(200).json({ success, message })
-                }
-                else {
-                    success = false
-                    message = "You don't follow the user!"
-                    res.status(403).json({ success, message })
+                    res.status(200).json({ success, message, updatedUserList })
                 }
             }
             else {
