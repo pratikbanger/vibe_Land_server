@@ -14,11 +14,8 @@ export const fetchAllUser = async (req, res) => {
     try {
 
         let users = await UserModel.find()
-
-        users = users.map((user) => {
-            const { password, ...users } = user._doc
-            return users
-        })
+            .sort({ createdAt: -1 })
+            // .select("-password")
 
         success = true
         message = "All users fetched successfully."
@@ -149,7 +146,7 @@ export const deleteUser = async (req, res) => {
     }
 }
 
-// Follow a user
+// Follow/UnFollow a user
 export const followUnFollowUser = async (req, res) => {
 
     try {
@@ -161,16 +158,16 @@ export const followUnFollowUser = async (req, res) => {
 
             const { _id } = req.body
             const user = await UserModel.findById(_id)
-            
+
             if (!(_id === id)) {
-                
+
                 if (!followUser.followers.includes(_id)) {
                     await followUser.updateOne({ $push: { followers: _id } })
                     await user.updateOne({ $push: { following: id } })
-                    
+
                     const updatedUser = await UserModel.findById(_id)
                     let updatedUserList = updatedUser.following
-                    
+
                     success = true
                     message = "User Followed!"
                     res.status(200).json({ success, message, updatedUserList })
@@ -178,7 +175,7 @@ export const followUnFollowUser = async (req, res) => {
                 else {
                     await followUser.updateOne({ $pull: { followers: _id } })
                     await user.updateOne({ $pull: { following: id } })
-                    
+
                     const updatedUser = await UserModel.findById(_id)
                     let updatedUserList = updatedUser.following
 
@@ -196,6 +193,37 @@ export const followUnFollowUser = async (req, res) => {
         else {
             message = "User account doesn't exist!"
             success = false
+            res.status(404).json({ success, message })
+        }
+
+    } catch (error) {
+        success = false
+        message = "Internal server error."
+        console.log("Error: " + error.message)
+        res.status(500).json({ success, message })
+    }
+}
+
+// Search user
+export const searchUser = async (req, res) => {
+    try {
+
+        const username = req.body.username
+
+        const user = await UserModel.find({
+            $or: [{ username: { "$regex": username } }]
+        }).select("-password")
+
+        if (user) {
+
+            success = true
+            message = "User found successfully"
+            res.status(200).json({ success, message, user })
+
+        }
+        else {
+            success = false
+            message = "User account doesn't exist! recheck username"
             res.status(404).json({ success, message })
         }
 
