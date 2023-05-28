@@ -15,7 +15,8 @@ export const fetchAllUser = async (req, res) => {
 
         let users = await UserModel.find()
             .sort({ createdAt: -1 })
-            // .select("-password")
+            .select("-password")
+            .limit(5)
 
         success = true
         message = "All users fetched successfully."
