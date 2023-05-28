@@ -16,7 +16,7 @@ export const fetchAllUser = async (req, res) => {
         let users = await UserModel.find()
             .sort({ createdAt: -1 })
             .select("-password")
-            .limit(5)
+            .limit(10)
 
         success = true
         message = "All users fetched successfully."
@@ -209,13 +209,11 @@ export const followUnFollowUser = async (req, res) => {
 export const searchUser = async (req, res) => {
     try {
 
-        const username = req.body.username
-
         const user = await UserModel.find({
-            $or: [{ username: { "$regex": username } }]
+            $or: [{ username: { "$regex": req.params.username } }]
         }).select("-password")
 
-        if (user) {
+        if (user.length !== 0) {
 
             success = true
             message = "User found successfully"
@@ -225,7 +223,7 @@ export const searchUser = async (req, res) => {
         else {
             success = false
             message = "User account doesn't exist! recheck username"
-            res.status(404).json({ success, message })
+            res.status(200).json({ success, message })
         }
 
     } catch (error) {

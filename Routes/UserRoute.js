@@ -8,7 +8,7 @@ import { getUser, updateUser, deleteUser, followUnFollowUser, fetchAllUser, sear
 
 // Routes for authentication
 Router.get('/fetchalluser/', fetchAllUser)
-Router.get('/searchuser', searchUser)
+Router.get('/searchuser/:username', searchUser)
 Router.get('/getuser/:id', authMiddleware, getUser)
 Router.put('/updateuser/:id', authMiddleware, updateUser)
 Router.delete('/deleteuser/:id', authMiddleware, deleteUser)
