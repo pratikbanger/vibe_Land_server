@@ -153,24 +153,24 @@ export const followUnFollowUser = async (req, res) => {
     try {
 
         const id = req.params.id
-        const followUser = await UserModel.findById(id)
+        const followUser = await UserModel.findById(id).select("-password")
 
         if (followUser) {
 
             const { _id } = req.body
-            const user = await UserModel.findById(_id)
+            const user = await UserModel.findById(_id).select("-password")
 
             if (!(_id === id)) {
 
                 if (!followUser.followers.includes(_id)) {
                     // await followUser.updateOne({ $push: { followers: _id } })
                     // await user.updateOne({ $push: { following: id } })
-                    await followUser.updateOne({ $push: { followers: user } })
-                    await user.updateOne({ $push: { following: followUser } })
-
+                    await followUser.updateOne({ $push: { followers: { _id: user } } })
+                    await user.updateOne({ $push: { following: { id: followUser } } })
+                    
                     const updatedUser = await UserModel.findById(_id)
                     let updatedUserList = updatedUser.following
-
+                    
                     success = true
                     message = "User Followed!"
                     res.status(200).json({ success, message, updatedUserList })
@@ -178,8 +178,8 @@ export const followUnFollowUser = async (req, res) => {
                 else {
                     // await followUser.updateOne({ $pull: { followers: _id } })
                     // await user.updateOne({ $pull: { following: id } })
-                    await followUser.updateOne({ $pull: { followers: user } })
-                    await user.updateOne({ $pull: { following: followUser } })
+                    await followUser.updateOne({ $pull: { followers: { _id: user } } })
+                    await user.updateOne({ $pull: { following: { id: followUser } } })
 
                     const updatedUser = await UserModel.findById(_id)
                     let updatedUserList = updatedUser.following
