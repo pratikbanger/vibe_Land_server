@@ -163,10 +163,8 @@ export const followUnFollowUser = async (req, res) => {
             if (!(_id === id)) {
 
                 if (!followUser.followers.includes(_id)) {
-                    // await followUser.updateOne({ $push: { followers: _id } })
-                    // await user.updateOne({ $push: { following: id } })
-                    await followUser.updateOne({ $push: { followers: { ...followUser.followers, [_id]: user } } })
-                    await user.updateOne({ $push: { following: { ...user.following, [id]: followUser } } })
+                    await followUser.updateOne({ $push: { followers: user } })
+                    await user.updateOne({ $push: { following: followUser } })
 
                     const updatedUser = await UserModel.findById(_id)
                     let updatedUserList = updatedUser.following
@@ -176,10 +174,8 @@ export const followUnFollowUser = async (req, res) => {
                     res.status(200).json({ success, message, updatedUserList })
                 }
                 else {
-                    // await followUser.updateOne({ $pull: { followers: _id } })
-                    // await user.updateOne({ $pull: { following: id } })
-                    await followUser.updateOne({ $pull: { followers: { ...followUser.followers, [_id]: user } } })
-                    await user.updateOne({ $pull: { following: { ...user.following, [id]: followUser } } })
+                    await followUser.updateOne({ $pull: { followers: user } })
+                    await user.updateOne({ $pull: { following: followUser } })
 
                     const updatedUser = await UserModel.findById(_id)
                     let updatedUserList = updatedUser.following
