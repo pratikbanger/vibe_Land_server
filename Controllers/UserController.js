@@ -234,6 +234,41 @@ export const followersList = async (req, res) => {
     }
 }
 
+// Following List
+export const followingList = async (req, res) => {
+
+    try {
+
+        const id = req.params.id
+        const userAccount = await UserModel.findById(id).select("-password")
+        
+        if (userAccount) {
+            
+            const { following, ...otherDetails } = userAccount
+            let list = []
+            
+            for (let i = 0; i < following.length; i++) {
+                const user = await UserModel.findById(following[i]).select("-password")
+                list = [...list, user]
+            }
+
+            res.status(200).json({ list })
+
+        }
+        else {
+            message = "User account doesn't exist!"
+            success = false
+            res.status(404).json({ success, message })
+        }
+
+    } catch (error) {
+        success = false
+        message = "Internal server error."
+        console.log("Error: " + error.message)
+        res.status(500).json({ success, message })
+    }
+}
+
 // Search user
 export const searchUser = async (req, res) => {
     try {
