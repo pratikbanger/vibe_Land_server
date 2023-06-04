@@ -149,7 +149,6 @@ export const deleteUser = async (req, res) => {
 
 // Follow/UnFollow a user
 export const followUnFollowUser = async (req, res) => {
-
     try {
 
         const id = req.params.id
@@ -190,6 +189,36 @@ export const followUnFollowUser = async (req, res) => {
                 success = false
                 res.status(403).json({ success, message })
             }
+        }
+
+    } catch (error) {
+        success = false
+        message = "Internal server error."
+        console.log("Error: " + error.message)
+        res.status(500).json({ success, message })
+    }
+}
+
+// Followers List
+export const followersList = async (req, res) => {
+
+    try {
+
+        const id = req.params.id
+        const userAccount = await UserModel.findById(id).select("-password")
+        
+        if (userAccount) {
+            
+            const { followers, ...otherDetails } = userAccount
+            let list = []
+            
+            for (let i = 0; i < followers.length; i++) {
+                const user = await UserModel.findById(followers[i]).select("-password")
+                list = [...list, user]
+            }
+
+            res.status(200).json({ list })
+
         }
         else {
             message = "User account doesn't exist!"
