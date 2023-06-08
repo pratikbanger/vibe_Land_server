@@ -189,6 +189,7 @@ export const deletePost = async (req, res) => {
 export const likePost = async (req, res) => {
     try {
 
+        console.log(req)
         const { userId } = req.body
         const user = await UserModel.findById(userId)
 
